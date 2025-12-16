@@ -1,7 +1,7 @@
 [project]
 name = "pytest-llm-agent"
 version = "0.1.1"
-description = "Add your description here"
+description = "LLM Agent for working with pytest"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
@@ -12,6 +12,9 @@ dependencies = [
 
 [project.scripts]
 pytest-llm-agent = "pytest_llm_agent.cli:main"
+
+[project.urls]
+Homepage = "https://github.com/laricko/pytest-llm-agent"
 
 [tool.hatch.build.targets.wheel]
 packages = ["pytest_llm_agent"]
