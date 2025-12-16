@@ -1,5 +1,7 @@
 import typer
 
+from pytest_llm_agent.agent import target as generate_tests_target
+
 app = typer.Typer(add_completion=False, help="CLI tool for generating pytest tests using LLMs")
 
 
@@ -12,12 +14,12 @@ def verbose(
 
 
 @app.command(help="Generate unit tests for the specified target")
-def unit(
+def target(
     target: str = typer.Argument(..., help="path[:Class[:method]] or path::function"),
     out: str = typer.Argument(..., help="Output file or folder for the generated tests"),
     prompt: str | None = typer.Option(None, "--prompt", help="Extra instructions for test generation"),
 ):
-    ...
+    generate_tests_target(target=target, out=out, prompt=prompt)
 
 
 @app.command(help="Fix test as it fails. Provide the failing test and the error message.")
