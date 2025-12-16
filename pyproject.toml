@@ -1,6 +1,6 @@
 [project]
 name = "pytest-llm-agent"
-version = "0.1.1"
+version = "0.1.2"
 description = "LLM Agent for working with pytest"
 readme = "README.md"
 requires-python = ">=3.13"
