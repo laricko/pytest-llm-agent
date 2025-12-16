@@ -1,4 +1,4 @@
-from asyncio import Protocol
+from typing import Protocol
 
 from pytest_llm_agent.core.dtos import UnitTest
 

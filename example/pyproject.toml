@@ -4,6 +4,5 @@ version = "0.1.0"
 dependencies = []
 
 [pytest-llm-agent]
-tests_dir = "tests"
-services = ["src/services.py"]
+model = "gpt-5"
 

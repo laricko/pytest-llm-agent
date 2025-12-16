@@ -1,15 +1,20 @@
+import os
 import tomllib
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
+
+ENV_SECRET_PREFIX = "PYTEST_LLM_AGENT_"
+
+
+def _load_prefixed_env(prefix: str = ENV_SECRET_PREFIX) -> dict[str, str]:
+    return {k.removeprefix(prefix): v for k, v in os.environ.items() if k.startswith(prefix)}
 
 
 @dataclass(slots=True)
 class PytestLLMAgentConfig:
-    protocols: list[str]
-    services: list[str]
-    tests_dir: str
     model: str
     general_prompt: str | None = None
+    secrets: dict[str, str] = field(default_factory=dict)
 
     @classmethod
     def load(cls, path: Path | None = None) -> "PytestLLMAgentConfig":
@@ -18,19 +23,11 @@ class PytestLLMAgentConfig:
         with path.open("rb") as f:
             data = tomllib.load(f)
 
-        cfg = data.get("pytest-llm-agent", {})
-        services = cfg.get("services")
-        if not services:
-            raise ValueError("No services defined in configuration")
-
-        protocols = cfg.get("protocols")
-        if not protocols:
-            raise ValueError("No protocols defined in configuration")
+        tool_cfg = data.get("tool", {})
+        cfg = tool_cfg.get("pytest-llm-agent", data.get("pytest-llm-agent", {}))
 
         return cls(
-            protocols=protocols,
-            services=services,
-            tests_dir=cfg.get("tests_dir", "tests"),
-            model=cfg.get("model"),
+            model=cfg.get("model", "gpt-5"),
             general_prompt=cfg.get("general_prompt"),
+            secrets=_load_prefixed_env(),
         )

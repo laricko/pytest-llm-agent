@@ -16,7 +16,10 @@ def verbose(
 @app.command(help="Generate unit tests for the specified target")
 def target(
     target: str = typer.Argument(..., help="path[:Class[:method]] or path::function"),
-    out: str = typer.Argument(..., help="Output file or folder for the generated tests"),
+    out: str | None = typer.Argument(
+        None,
+        help="Optional output file or folder for the generated tests",
+    ),
     prompt: str | None = typer.Option(None, "--prompt", help="Extra instructions for test generation"),
 ):
     generate_tests_target(target=target, out=out, prompt=prompt)

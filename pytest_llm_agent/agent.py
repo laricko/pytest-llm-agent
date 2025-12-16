@@ -1,5 +1,9 @@
+import os
+from typing import Any, Protocol
+
 from langchain.agents import create_agent
 
+from pytest_llm_agent.config import PytestLLMAgentConfig
 from pytest_llm_agent.core.services import PytestAgentToolsService
 from pytest_llm_agent.repository import SqliteUnitTestDbRepository
 from pytest_llm_agent.tools import build_langchain_tools
@@ -7,6 +11,10 @@ from pytest_llm_agent.tools import build_langchain_tools
 db_repository = SqliteUnitTestDbRepository()
 service = PytestAgentToolsService(unit_test_repo=db_repository)
 tools = build_langchain_tools(service)
+
+
+class AgentInvoker(Protocol):
+    def invoke(self, input: Any, *args: Any, **kwargs: Any) -> Any: ...
 
 
 DEFAULT_SYSTEM_PROMPT = """\
@@ -23,22 +31,27 @@ Your job:
 Return a short summary of what you did at the end.
 """
 
-agent = create_agent(
-    "gpt-5",
+llm_config = PytestLLMAgentConfig.load()
+for key, value in llm_config.secrets.items():
+    os.environ[key] = value
+
+agent: AgentInvoker = create_agent(
+    llm_config.model,
     tools=tools,
-    system_prompt=DEFAULT_SYSTEM_PROMPT,
+    system_prompt=llm_config.general_prompt or DEFAULT_SYSTEM_PROMPT,
 )
 
 
-def target(target: str, out: str, prompt: str | None = None):
+def target(target: str, out: str | None = None, prompt: str | None = None):
+    output_instruction = f"Write the tests to: {out}. " if out else ""
+
     agent.invoke(
         {
             "messages": [
                 {
                     "role": "user",
                     "content": f"Generate pytest unit tests for the target: {target}. "
-                    f"Write the tests to: {out}. "
-                    + (f"Additional instructions: {prompt}" if prompt else ""),
+                    f"{output_instruction}" + (f"Additional instructions: {prompt}" if prompt else ""),
                 }
             ]
         }
