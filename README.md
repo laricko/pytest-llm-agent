@@ -39,3 +39,11 @@ You can optionally pass additional instructions to steer generation:
 ```bash
 pytest-llm-agent target path/to/module.py::function tests/test_module.py --prompt "Focus on edge cases"
 ```
+
+## Contribution
+
+Very welcome. Make sure you also update tests if you add some services logic.
+
+```
+PYTHONPATH=. uv run pytest .
+```
